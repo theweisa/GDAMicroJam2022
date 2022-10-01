@@ -8,18 +8,16 @@ public class NoteEmitter : MonoBehaviour
     public GameObject redNote;
     public GameObject greenNote;
     public GameObject yellowNote;
+
+    // Declared dictionary here so it can be used in a function
     public IDictionary<int, GameObject> numberNotes = new Dictionary<int, GameObject>();
 
     void EmitNote(float x, float y, float xV)
     {
-        // Debug.Log("X0: " + x + ";Y1: " + y);
         GameObject emittingNote = numberNotes[Random.Range(0, 4)];
         GameObject EmittedNote = (GameObject)Instantiate(emittingNote, new Vector3(x, y, 0), Quaternion.identity);
-        // Debug.Log("X1: " + EmittedNote.transform.position.x + ";Y1: " + EmittedNote.transform.position.y);
         Rigidbody2D rb = EmittedNote.GetComponent<Rigidbody2D>();
         rb.velocity = new Vector3(xV, 0, 0);
-        // Debug.Log("Velocity: " + rb.velocity + "Wanted Velocity: " + xV);
-        // Debug.Log("X2: " + EmittedNote.transform.position.x + ";Y2: " + EmittedNote.transform.position.y);
     }
 
     IEnumerator SpitNotes()
