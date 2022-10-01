@@ -14,7 +14,7 @@ public class NoteEmitter : MonoBehaviour
         // Debug.Log("X1: " + EmittedNote.transform.position.x + ";Y1: " + EmittedNote.transform.position.y);
         Rigidbody2D rb = EmittedNote.GetComponent<Rigidbody2D>();
         rb.velocity = new Vector3(xV, 0, 0);
-        Debug.Log("Velocity: " + rb.velocity + "Wanted Velocity: " + xV);
+        // Debug.Log("Velocity: " + rb.velocity + "Wanted Velocity: " + xV);
         // Debug.Log("X2: " + EmittedNote.transform.position.x + ";Y2: " + EmittedNote.transform.position.y);
     }
 
