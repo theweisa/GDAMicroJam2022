@@ -1,15 +1,21 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class NoteEmitter : MonoBehaviour
 {
-    // Declaleft the notes and dictionary here so they can be used in functions
+    // Declaleft the controller, notes and dictionary here so they can be used in functions
+    public MicrogameJamController controller;
     public GameObject upNote;  // Up
     public GameObject leftNote;   // Left
     public GameObject rightNote; // Right
     public GameObject downNote;  // Down
     public IDictionary<int, GameObject> numberNotes = new Dictionary<int, GameObject>();
+
+    // Set milliseconds before each note (needs to be read in from map)
+    public List<float> timeBeforeNotes = new List<float>();
 
     // List of notes to be used by the note detector
     public List<GameObject> allNotes = new List<GameObject>();
@@ -69,15 +75,15 @@ public class NoteEmitter : MonoBehaviour
     void EmitNote(float x, float y, float xV)
     {
         // Chooses a random note out of the four to use
-        GameObject emittingNote = numberNotes[Random.Range(0, 4)];
+        GameObject emittingNote = numberNotes[UnityEngine.Random.Range(0, 4)];
         
         // Instantiates the note at the given spawn location with no rotation
-        GameObject EmittedNote = (GameObject)Instantiate(emittingNote, new Vector3(x, y, 0), Quaternion.identity);
+        GameObject emittedNote = (GameObject)Instantiate(emittingNote, new Vector3(x, y, 0), Quaternion.identity);
 
-        allNotes.Add(EmittedNote);
+        allNotes.Add(emittedNote);
 
         // Give the note the specified speed
-        Rigidbody2D rb = EmittedNote.GetComponent<Rigidbody2D>();
+        Rigidbody2D rb = emittedNote.GetComponent<Rigidbody2D>();
         rb.velocity = new Vector3(xV, 0, 0);
     }
 
@@ -92,20 +98,24 @@ public class NoteEmitter : MonoBehaviour
         float yDetect = detector.transform.position.y;
 
         // Set rate of note emitting
-        float noteRate = 2f;
+        // float noteRate = 1f;
 
-        // Sets time for note to get from emitter to detector
+        // Sets time for note to get from emitter to detector (in seconds)
         float noteTime = 2f;
 
         // Calculates necessary note velocity
         float xDist = xDetect - xEmit;
         float xVel = xDist / noteTime;
 
+        int numOfNotes = timeBeforeNotes.Count;
+
         // Calls the note emitter every x second(s)
-        for(;;)
+        for(int i=0; i<numOfNotes; i++)
         {
+            // yield return new WaitForSeconds(noteRate);
+            print(timeBeforeNotes[i]);
+            yield return new WaitForSeconds(timeBeforeNotes[i]/1000f);
             EmitNote(xEmit, yEmit, xVel);
-            yield return new WaitForSeconds(noteRate);
         }
     }
 
@@ -114,6 +124,44 @@ public class NoteEmitter : MonoBehaviour
     {
         // Gets note Detector
         detector = GameObject.Find("NotePress");
+        
+        // Initialize Game Jam Controller
+        controller = GameObject.Find("Jam Controller").GetComponent<MicrogameJamController>();
+
+        // Gets current difficulty (1, 2, or 3)
+        int difficulty = controller.GetDifficulty();
+
+        // Reads the given csv files
+        StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chart.csv");
+
+        // Initializes float for holding the times of notes that are passed over due to difficulty
+        float addedMilliseconds = 0f;
+
+        // Toss away the header line of the csv file
+        string line = reader.ReadLine();
+
+        while ((line = reader.ReadLine()) != null)
+        {
+            string[] words = line.Split(',');
+
+            // Get the difficulty of the note
+            int noteDifficulty = Int32.Parse(words[1]);
+
+            // If the note is within difficulty, add it to the list
+            if (noteDifficulty <= difficulty)
+            {
+                float millisecondCount = float.Parse(words[0]);
+                timeBeforeNotes.Add(millisecondCount + addedMilliseconds);
+
+                // Reset the added milliseconds
+                addedMilliseconds = 0f;
+            }
+
+            // If it's not, add the milliseconds left over
+            else {
+                addedMilliseconds += float.Parse(words[0]);
+            }
+        }
 
         // Find and add all of the types of notes to a dictionary for randomization purposes
         upNote = GameObject.Find("UpNote");
