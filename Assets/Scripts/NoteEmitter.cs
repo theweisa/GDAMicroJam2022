@@ -6,12 +6,12 @@ using UnityEngine;
 
 public class NoteEmitter : MonoBehaviour
 {
-    // Declared the controller, notes, and dictionary here so they can be used in functions
+    // Declaleft the controller, notes and dictionary here so they can be used in functions
     public MicrogameJamController controller;
-    public GameObject blueNote;
-    public GameObject redNote;
-    public GameObject greenNote;
-    public GameObject yellowNote;
+    public GameObject upNote;  // Up
+    public GameObject leftNote;   // Left
+    public GameObject rightNote; // Right
+    public GameObject downNote;  // Down
     public IDictionary<int, GameObject> numberNotes = new Dictionary<int, GameObject>();
 
     // Set milliseconds before each note (needs to be read in from map)
@@ -19,6 +19,57 @@ public class NoteEmitter : MonoBehaviour
 
     // List of notes to be used by the note detector
     public List<GameObject> allNotes = new List<GameObject>();
+  
+    // Declares note Detector
+    public GameObject detector;
+    // distance for input to be valid
+    public const float validInputDistance = 1f;
+    // distance for input to be too early or late
+    public const float offDistance = 0.5f;
+    // distance to pop note from list
+    public const float tooFarDistance = 1f;
+
+    // Returns true if distance between first note and noteDetector is close enough to process input
+    bool isValidInput()
+    {
+        if (Mathf.Abs(detector.transform.position.x - allNotes[0].transform.position.x) < validInputDistance)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // Returns true if button press is too early
+    bool earlyCheck()
+    {
+        if ((allNotes[0].transform.position.x - detector.transform.position.x) > offDistance)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // Returns true if button press is too late
+    bool lateCheck()
+    {
+        if ((detector.transform.position.x - allNotes[0].transform.position.x) > offDistance)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // Returns true if correct button is pressed
+    bool successCheck()
+    {
+        Note note = allNotes[0].GetComponent<Note>();
+        if ((note.type == 0 && Input.GetKeyDown("up")) || (note.type == 1 && Input.GetKeyDown("left")) ||
+            (note.type == 2 && Input.GetKeyDown("right")) || (note.type == 3 && Input.GetKeyDown("down")))
+        {
+            return true;
+        }
+        return false;
+    }
 
     // Takes in note spawn location and speed as arguments
     void EmitNote(float x, float y, float xV)
@@ -40,11 +91,11 @@ public class NoteEmitter : MonoBehaviour
     {
         // Set Note Spawn Location
         float xEmit = 9f;
-        float yEmit = -3f;
+        float yEmit = detector.transform.position.y;
 
         // Set Note Detector Location
-        float xDetect = -2f;
-        // float yDetect = -3f;
+        float xDetect = detector.transform.position.x;
+        float yDetect = detector.transform.position.y;
 
         // Set rate of note emitting
         // float noteRate = 1f;
@@ -71,6 +122,9 @@ public class NoteEmitter : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Gets note Detector
+        detector = GameObject.Find("NotePress");
+        
         // Initialize Game Jam Controller
         controller = GameObject.Find("Jam Controller").GetComponent<MicrogameJamController>();
 
@@ -110,14 +164,14 @@ public class NoteEmitter : MonoBehaviour
         }
 
         // Find and add all of the types of notes to a dictionary for randomization purposes
-        blueNote = GameObject.Find("BlueNote");
-        redNote = GameObject.Find("RedNote");
-        greenNote = GameObject.Find("GreenNote");
-        yellowNote = GameObject.Find("YellowNote");
-        numberNotes.Add(0, blueNote);
-        numberNotes.Add(1, redNote);
-        numberNotes.Add(2, greenNote);
-        numberNotes.Add(3, yellowNote);
+        upNote = GameObject.Find("UpNote");
+        leftNote = GameObject.Find("LeftNote");
+        rightNote = GameObject.Find("RightNote");
+        downNote = GameObject.Find("DownNote");
+        numberNotes.Add(0, upNote);
+        numberNotes.Add(1, leftNote);
+        numberNotes.Add(2, rightNote);
+        numberNotes.Add(3, downNote);
 
         // Actually starts the note emitting
         StartCoroutine("SpitNotes");
@@ -126,6 +180,44 @@ public class NoteEmitter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (Input.GetKeyDown("left") || Input.GetKeyDown("down") || 
+            Input.GetKeyDown("right") || Input.GetKeyDown("up"))
+        {
+            if (allNotes.Count > 0 && isValidInput()) {
+                if (earlyCheck())
+                {
+                    print("TOO EARLY, LOSE");
+                    // Lose function or health - 1
+                }
+                else if (lateCheck())
+                {
+                    print("TOO LATE, LOSE");
+                    // Lose function or health - 1
+                }
+                else if (!successCheck())
+                {
+                    print("WRONG BUTTON, LOSE");
+                    // Lose function or health - 1
+                }
+                else
+                {
+                    print("SUCCESS!!!");
+                    // Success Sound and Visual
+                }
+                Destroy(allNotes[0]);
+                allNotes.RemoveAt(0);
+                return;
+            }
+        }
+        // Check if note is too far past detector and add to fail condition
+        if  ((allNotes.Count > 0) && 
+            ((detector.transform.position.x - allNotes[0].transform.position.x) > tooFarDistance))
+        {
+            // Lose function or health - 1
+            print("TOO FAR!");
+            Destroy(allNotes[0]);
+            allNotes.RemoveAt(0);
+            return;
+        }
     }
 }
