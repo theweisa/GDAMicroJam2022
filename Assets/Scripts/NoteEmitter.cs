@@ -13,6 +13,7 @@ public class NoteEmitter : MonoBehaviour
     public GameObject rightNote; // Right
     public GameObject downNote;  // Down
     public IDictionary<int, GameObject> numberNotes = new Dictionary<int, GameObject>();
+    public int notesPlayed = 0;
 
     // Set milliseconds before each note (needs to be read in from map)
     public List<float> timeBeforeNotes = new List<float>();
@@ -124,9 +125,72 @@ public class NoteEmitter : MonoBehaviour
         for(int i=0; i<numOfNotes; i++)
         {
             // yield return new WaitForSeconds(noteRate);
-            //print(timeBeforeNotes[i]);
+            // print(timeBeforeNotes[i]);
             yield return new WaitForSeconds(timeBeforeNotes[i]/1000f);
             EmitNote(xEmit, yEmit, xVel);
+        }
+    }
+
+    void FoldAnimation() {
+        Note note = allNotes[0].GetComponent<Note>();
+        int noteType = note.type;
+        int numOfNotes = timeBeforeNotes.Count;
+        if (notesPlayed > (2 * numOfNotes / 3))
+        {
+            if (noteType == 0)
+            {
+                // Use Fold1/FoldU animation
+            }
+            else if (noteType == 1)
+            {
+                // Use Fold1/FoldL animation
+            }
+            else if (noteType == 2)
+            {
+                // Use Fold1/FoldR animation
+            }
+            else
+            {
+                // Use Fold1/FoldU animation
+            }
+        }
+        else if (notesPlayed > (numOfNotes / 3))
+        {
+            if (noteType == 0)
+            {
+                // Use Fold2/foldU animation
+            }
+            else if (noteType == 1)
+            {
+                // Use Fold2/foldL animation
+            }
+            else if (noteType == 2)
+            {
+                // Use Fold2/foldR animation
+            }
+            else
+            {
+                // Use Fold2/foldU animation
+            }
+        }
+        else
+        {
+            if (noteType == 0)
+            {
+                // Use Fold3/foldU animation
+            }
+            else if (noteType == 1)
+            {
+                // Use Fold3/foldL animation
+            }
+            else if (noteType == 2)
+            {
+                // Use Fold3/foldR animation
+            }
+            else
+            {
+                // Use Fold3/foldU animation
+            }
         }
     }
 
@@ -194,14 +258,16 @@ public class NoteEmitter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (allNotes.Count <= 0) {
+            return;
+        }
         bool success = false;
-        // respond to key input
+        detector.GetComponent<SpriteRenderer>().sprite = allNotes[0].GetComponent<SpriteRenderer>().sprite;
+        int successState = 0;
         if (Input.GetKeyDown("left") || Input.GetKeyDown("down") || 
             Input.GetKeyDown("right") || Input.GetKeyDown("up"))
         {
-            int successState = 0;
-            // when note is within range & user clicked, check
-            if (allNotes.Count > 0 && isValidInput()) {
+            if (isValidInput()) {
                 successState = successCheck();
                 if (earlyCheck())
                 {
@@ -223,6 +289,7 @@ public class NoteEmitter : MonoBehaviour
                     success = true;
                     print("SUCCESS!!!");
                     // Success Sound and Visual
+                    FoldAnimation();
                 }
 
                 // play animation and sfx depending on if success or not
@@ -242,13 +309,13 @@ public class NoteEmitter : MonoBehaviour
                 // add to note counter
                 noteCounter++;
                 Destroy(allNotes[0]);
+                notesPlayed++;
                 allNotes.RemoveAt(0);
                 return;
             }
         }
         // Check if note is too far past detector and add to fail condition
-        if  ((allNotes.Count > 0) && 
-            ((detector.transform.position.x - allNotes[0].transform.position.x) > tooFarDistance))
+        if  ((detector.transform.position.x - allNotes[0].transform.position.x) > tooFarDistance)
         {
             print("TOO FAR!");
             // Lose function or health - 1
@@ -262,6 +329,7 @@ public class NoteEmitter : MonoBehaviour
             }
             noteCounter++;
             Destroy(allNotes[0]);
+            notesPlayed++;
             allNotes.RemoveAt(0);
             return;
         }
