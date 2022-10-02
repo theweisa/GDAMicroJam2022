@@ -15,6 +15,9 @@ public class NoteEmitter : MonoBehaviour
     public IDictionary<int, GameObject> numberNotes = new Dictionary<int, GameObject>();
     public int notesPlayed = 0;
 
+    // Sets time for note to get from emitter to detector (in seconds)
+    public float noteTime = 2f;
+
     // Set milliseconds before each note (needs to be read in from map)
     public List<float> timeBeforeNotes = new List<float>();
 
@@ -112,9 +115,6 @@ public class NoteEmitter : MonoBehaviour
         // Set rate of note emitting
         // float noteRate = 1f;
 
-        // Sets time for note to get from emitter to detector (in seconds)
-        float noteTime = 2f;
-
         // Calculates necessary note velocity
         float xDist = xDetect - xEmit;
         float xVel = xDist / noteTime;
@@ -128,69 +128,6 @@ public class NoteEmitter : MonoBehaviour
             // print(timeBeforeNotes[i]);
             yield return new WaitForSeconds(timeBeforeNotes[i]/1000f);
             EmitNote(xEmit, yEmit, xVel);
-        }
-    }
-
-    void FoldAnimation() {
-        Note note = allNotes[0].GetComponent<Note>();
-        int noteType = note.type;
-        int numOfNotes = timeBeforeNotes.Count;
-        if (notesPlayed > (2 * numOfNotes / 3))
-        {
-            if (noteType == 0)
-            {
-                // Use Fold1/FoldU animation
-            }
-            else if (noteType == 1)
-            {
-                // Use Fold1/FoldL animation
-            }
-            else if (noteType == 2)
-            {
-                // Use Fold1/FoldR animation
-            }
-            else
-            {
-                // Use Fold1/FoldU animation
-            }
-        }
-        else if (notesPlayed > (numOfNotes / 3))
-        {
-            if (noteType == 0)
-            {
-                // Use Fold2/foldU animation
-            }
-            else if (noteType == 1)
-            {
-                // Use Fold2/foldL animation
-            }
-            else if (noteType == 2)
-            {
-                // Use Fold2/foldR animation
-            }
-            else
-            {
-                // Use Fold2/foldU animation
-            }
-        }
-        else
-        {
-            if (noteType == 0)
-            {
-                // Use Fold3/foldU animation
-            }
-            else if (noteType == 1)
-            {
-                // Use Fold3/foldL animation
-            }
-            else if (noteType == 2)
-            {
-                // Use Fold3/foldR animation
-            }
-            else
-            {
-                // Use Fold3/foldU animation
-            }
         }
     }
 
@@ -289,7 +226,6 @@ public class NoteEmitter : MonoBehaviour
                     success = true;
                     print("SUCCESS!!!");
                     // Success Sound and Visual
-                    FoldAnimation();
                 }
 
                 // play animation and sfx depending on if success or not
