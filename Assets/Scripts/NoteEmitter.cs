@@ -36,11 +36,19 @@ public class NoteEmitter : MonoBehaviour
         float xEmit = 9f;
         float yEmit = -3f;
 
-        // Set Note Speed
-        float xVel = -2f;
+        // Set Note Detector Location
+        float xDetect = -2f;
+        // float yDetect = -3f;
 
         // Set rate of note emitting
         float noteRate = 1f;
+
+        // Sets time for note to get from emitter to detector)
+        float noteTime = 5f;
+
+        // Calculates necessary note velocity
+        float xDist = xDetect - xEmit;
+        float xVel = xDist / noteTime;
 
         // Calls the note emitter every x second(s)
         for(;;)
