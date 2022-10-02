@@ -214,6 +214,19 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7720313149827335950, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}
   m_PrefabInstance: {fileID: 5662672527563523114}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &133631414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 133631413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe1b63cd202e422698f4bfca74516e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  note: {fileID: 0}
 --- !u!4 &133631415 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5276842085796073307, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}
@@ -317,7 +330,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7720313149827335950, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}
       propertyPath: m_Name
-      value: RedNote
+      value: LeftNote
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}
@@ -347,6 +360,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &294851028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 294851026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe1b63cd202e422698f4bfca74516e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  note: {fileID: 0}
 --- !u!4 &294851029 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5276842085796073307, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}
@@ -429,7 +455,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7720313149827335950, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}
       propertyPath: m_Name
-      value: GreenNote
+      value: RightNote
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}
@@ -459,6 +485,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &305831083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 305831081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe1b63cd202e422698f4bfca74516e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  note: {fileID: 0}
 --- !u!4 &305831084 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5276842085796073307, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}
@@ -545,7 +584,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7720313149827335950, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}
       propertyPath: m_Name
-      value: PinkNote
+      value: DownNote
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}
@@ -575,6 +614,19 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &407946650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 407946648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe1b63cd202e422698f4bfca74516e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  note: {fileID: 0}
 --- !u!4 &407946651 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5276842085796073307, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}
@@ -619,10 +671,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 489426c53a9834219990a3768f9cb220, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blueNote: {fileID: 0}
-  redNote: {fileID: 0}
-  greenNote: {fileID: 0}
-  pinkNote: {fileID: 0}
+  upNote: {fileID: 0}
+  leftNote: {fileID: 0}
+  rightNote: {fileID: 0}
+  downNote: {fileID: 0}
   allNotes: []
   detector: {fileID: 0}
 --- !u!20 &519420031
@@ -1218,7 +1270,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7720313149827335950, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}
       propertyPath: m_Name
-      value: BlueNote
+      value: UpNote
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5d1f2f895832e475089dd9b567f8f25f, type: 3}

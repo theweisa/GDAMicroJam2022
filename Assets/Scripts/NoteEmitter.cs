@@ -56,8 +56,13 @@ public class NoteEmitter : MonoBehaviour
     // Returns true if correct button is pressed
     bool successCheck()
     {
-        return true;
-        //if (allNotes[0] up)
+        Note note = allNotes[0].GetComponent<Note>();
+        if ((note.type == 0 && Input.GetKeyDown("up")) || (note.type == 1 && Input.GetKeyDown("left")) ||
+            (note.type == 2 && Input.GetKeyDown("right")) || (note.type == 3 && Input.GetKeyDown("down")))
+        {
+            return true;
+        }
+        return false;
     }
 
     // Takes in note spawn location and speed as arguments
@@ -133,22 +138,22 @@ public class NoteEmitter : MonoBehaviour
             if (allNotes.Count > 0 && isValidInput()) {
                 if (earlyCheck())
                 {
-                    Debug.Log("TOO EARLY, LOSE");
+                    print("TOO EARLY, LOSE");
                     // Lose function or health - 1
                 }
                 else if (lateCheck())
                 {
-                    Debug.Log("TOO LATE, LOSE");
+                    print("TOO LATE, LOSE");
                     // Lose function or health - 1
                 }
                 else if (!successCheck())
                 {
-                    Debug.Log("WRONG BUTTON, LOSE");
+                    print("WRONG BUTTON, LOSE");
                     // Lose function or health - 1
                 }
                 else
                 {
-                    Debug.Log("SUCCESS!!!");
+                    print("SUCCESS!!!");
                     // Success Sound and Visual
                 }
                 Destroy(allNotes[0]);
@@ -161,7 +166,7 @@ public class NoteEmitter : MonoBehaviour
             ((detector.transform.position.x - allNotes[0].transform.position.x) > tooFarDistance))
         {
             // Lose function or health - 1
-            Debug.Log("TOO FAR!");
+            print("TOO FAR!");
             Destroy(allNotes[0]);
             allNotes.RemoveAt(0);
             return;
