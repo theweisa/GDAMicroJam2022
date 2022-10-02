@@ -14,6 +14,9 @@ public class NoteEmitter : MonoBehaviour
     public GameObject downNote;  // Down
     public IDictionary<int, GameObject> numberNotes = new Dictionary<int, GameObject>();
 
+    // Sets time for note to get from emitter to detector (in seconds)
+    public float noteTime = 2f;
+
     // Set milliseconds before each note (needs to be read in from map)
     public List<float> timeBeforeNotes = new List<float>();
 
@@ -110,9 +113,6 @@ public class NoteEmitter : MonoBehaviour
 
         // Set rate of note emitting
         // float noteRate = 1f;
-
-        // Sets time for note to get from emitter to detector (in seconds)
-        float noteTime = 2f;
 
         // Calculates necessary note velocity
         float xDist = xDetect - xEmit;
@@ -228,6 +228,10 @@ public class NoteEmitter : MonoBehaviour
                 {
                     success = true;
                     print("SUCCESS!!!");
+<<<<<<< HEAD
+=======
+                    // Success Sound and Visual
+>>>>>>> ddfbbb971231919ef25ee96b6403aac727fb889a
                 }
 
                 // play animation and sfx depending on if success or not

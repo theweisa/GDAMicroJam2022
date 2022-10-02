@@ -776,6 +776,8 @@ MonoBehaviour:
   leftNote: {fileID: 0}
   rightNote: {fileID: 0}
   downNote: {fileID: 0}
+  notesPlayed: 0
+  noteTime: 2
   timeBeforeNotes: []
   allNotes: []
   detector: {fileID: 0}
@@ -826,6 +828,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 626c52d4620b4ce4aa0f45d030a15986, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NoteEmitter: {fileID: 0}
   audioSource: {fileID: 1270482189}
 --- !u!4 &722899680
 Transform:
@@ -852,6 +855,7 @@ GameObject:
   - component: {fileID: 822789976}
   - component: {fileID: 822789975}
   - component: {fileID: 822789977}
+  - component: {fileID: 822789978}
   m_Layer: 0
   m_Name: Hands
   m_TagString: Untagged
@@ -943,6 +947,23 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &822789978
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 822789974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cedff7c9dd6a54e24b3727507b9b94d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  delayTime: 0.4615384
+  tweenDuration: 0.1
+  tweenAmount: 0.2
+  tweenEndLocation: {x: 0, y: 0, z: 0}
+  NoteEmitter: {fileID: 0}
 --- !u!1 &841781249
 GameObject:
   m_ObjectHideFlags: 0
