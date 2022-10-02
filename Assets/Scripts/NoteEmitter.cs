@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class NoteEmitter : MonoBehaviour
 {
-    // Declared the notes and dictionary here so they can be used in functions
-    public GameObject blueNote;   // Up
-    public GameObject redNote;    // Down
-    public GameObject greenNote;  // Left
-    public GameObject yellowNote; // Right
+    // Declaleft the notes and dictionary here so they can be used in functions
+    public GameObject upNote;  // Up
+    public GameObject leftNote;   // Left
+    public GameObject rightNote; // Right
+    public GameObject downNote;  // Down
     public IDictionary<int, GameObject> numberNotes = new Dictionary<int, GameObject>();
 
     // List of notes to be used by the note detector
@@ -17,9 +17,11 @@ public class NoteEmitter : MonoBehaviour
     // Declares note Detector
     public GameObject detector;
     // distance for input to be valid
-    public const float validInputDistance = 3f;
+    public const float validInputDistance = 1f;
     // distance for input to be too early or late
-    public const float offDistance = 1f;
+    public const float offDistance = 0.5f;
+    // distance to pop note from list
+    public const float tooFarDistance = 1f;
 
     // Returns true if distance between first note and noteDetector is close enough to process input
     bool isValidInput()
@@ -55,7 +57,7 @@ public class NoteEmitter : MonoBehaviour
     bool successCheck()
     {
         return true;
-        //if (allNotes[0] blue)
+        //if (allNotes[0] up)
     }
 
     // Takes in note spawn location and speed as arguments
@@ -78,17 +80,17 @@ public class NoteEmitter : MonoBehaviour
     {
         // Set Note Spawn Location
         float xEmit = 9f;
-        float yEmit = -3f;
+        float yEmit = detector.transform.position.y;
 
         // Set Note Detector Location
-        float xDetect = -2f;
-        // float yDetect = -3f;
+        float xDetect = detector.transform.position.x;
+        float yDetect = detector.transform.position.y;
 
         // Set rate of note emitting
-        float noteRate = 1f;
+        float noteRate = 2f;
 
-        // Sets time for note to get from emitter to detector)
-        float noteTime = 5f;
+        // Sets time for note to get from emitter to detector
+        float noteTime = 2f;
 
         // Calculates necessary note velocity
         float xDist = xDetect - xEmit;
@@ -109,14 +111,14 @@ public class NoteEmitter : MonoBehaviour
         detector = GameObject.Find("NotePress");
 
         // Find and add all of the types of notes to a dictionary for randomization purposes
-        blueNote = GameObject.Find("BlueNote");
-        redNote = GameObject.Find("RedNote");
-        greenNote = GameObject.Find("GreenNote");
-        yellowNote = GameObject.Find("YellowNote");
-        numberNotes.Add(0, blueNote);
-        numberNotes.Add(1, redNote);
-        numberNotes.Add(2, greenNote);
-        numberNotes.Add(3, yellowNote);
+        upNote = GameObject.Find("UpNote");
+        leftNote = GameObject.Find("LeftNote");
+        rightNote = GameObject.Find("RightNote");
+        downNote = GameObject.Find("DownNote");
+        numberNotes.Add(0, upNote);
+        numberNotes.Add(1, leftNote);
+        numberNotes.Add(2, rightNote);
+        numberNotes.Add(3, downNote);
 
         // Actually starts the note emitting
         StartCoroutine("SpitNotes");
@@ -128,34 +130,41 @@ public class NoteEmitter : MonoBehaviour
         if (Input.GetKeyDown("left") || Input.GetKeyDown("down") || 
             Input.GetKeyDown("right") || Input.GetKeyDown("up"))
         {
-            //Debug.Log(Mathf.Abs(detector.transform.position.x - allNotes[0].transform.position.x));
-            if (isValidInput()) {
+            if (allNotes.Count > 0 && isValidInput()) {
                 if (earlyCheck())
                 {
                     Debug.Log("TOO EARLY, LOSE");
-                    // Lose function
-                    return;
+                    // Lose function or health - 1
                 }
-                if (lateCheck())
+                else if (lateCheck())
                 {
                     Debug.Log("TOO LATE, LOSE");
-                    // Lose function
-                    return;
+                    // Lose function or health - 1
                 }
-                if (!successCheck())
+                else if (!successCheck())
                 {
                     Debug.Log("WRONG BUTTON, LOSE");
-                    // Lose function
-                    return;
+                    // Lose function or health - 1
                 }
                 else
                 {
                     Debug.Log("SUCCESS!!!");
-                    // Delete note here?
-                    return;
+                    // Success Sound and Visual
                 }
-
+                Destroy(allNotes[0]);
+                allNotes.RemoveAt(0);
+                return;
             }
+        }
+        // Check if note is too far past detector and add to fail condition
+        if  ((allNotes.Count > 0) && 
+            ((detector.transform.position.x - allNotes[0].transform.position.x) > tooFarDistance))
+        {
+            // Lose function or health - 1
+            Debug.Log("TOO FAR!");
+            Destroy(allNotes[0]);
+            allNotes.RemoveAt(0);
+            return;
         }
     }
 }
