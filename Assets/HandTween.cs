@@ -27,7 +27,7 @@ public class HandTween : MonoBehaviour
     {
         // Wait until the song starts
         float time = GameObject.Find("NoteEmitter").GetComponent<NoteEmitter>().noteTime;
-        yield return new WaitForSeconds(time);
+        // yield return new WaitForSeconds(time);
 
         // Run this infinitely
         for (;;)
