@@ -25,9 +25,20 @@ public class NoteEmitter : MonoBehaviour
     // distance for input to be valid
     public const float validInputDistance = 1f;
     // distance for input to be too early or late
-    public const float offDistance = 0.5f;
+    public const float offDistance = 0.75f;
     // distance to pop note from list
     public const float tooFarDistance = 1f;
+    // number of notes emitted
+    private int noteCounter;
+    // total number of notes
+    private int numOfNotes;
+
+    // sfx
+    public AudioSource hitSfx;
+    public AudioSource missSfx;
+    public AudioSource gameOverSfx;
+
+    public int health;
 
     // Returns true if distance between first note and noteDetector is close enough to process input
     bool isValidInput()
@@ -60,15 +71,15 @@ public class NoteEmitter : MonoBehaviour
     }
 
     // Returns true if correct button is pressed
-    bool successCheck()
+    int successCheck()
     {
         Note note = allNotes[0].GetComponent<Note>();
         if ((note.type == 0 && Input.GetKeyDown("up")) || (note.type == 1 && Input.GetKeyDown("left")) ||
             (note.type == 2 && Input.GetKeyDown("right")) || (note.type == 3 && Input.GetKeyDown("down")))
         {
-            return true;
+            return note.type;
         }
-        return false;
+        return -1;
     }
 
     // Takes in note spawn location and speed as arguments
@@ -107,13 +118,13 @@ public class NoteEmitter : MonoBehaviour
         float xDist = xDetect - xEmit;
         float xVel = xDist / noteTime;
 
-        int numOfNotes = timeBeforeNotes.Count;
+        //int numOfNotes = timeBeforeNotes.Count;
 
         // Calls the note emitter every x second(s)
         for(int i=0; i<numOfNotes; i++)
         {
             // yield return new WaitForSeconds(noteRate);
-            print(timeBeforeNotes[i]);
+            //print(timeBeforeNotes[i]);
             yield return new WaitForSeconds(timeBeforeNotes[i]/1000f);
             EmitNote(xEmit, yEmit, xVel);
         }
@@ -122,6 +133,8 @@ public class NoteEmitter : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        noteCounter = 0;
+        health = 3;
         // Gets note Detector
         detector = GameObject.Find("NotePress");
         
@@ -162,6 +175,7 @@ public class NoteEmitter : MonoBehaviour
                 addedMilliseconds += float.Parse(words[0]);
             }
         }
+        numOfNotes = timeBeforeNotes.Count;
 
         // Find and add all of the types of notes to a dictionary for randomization purposes
         upNote = GameObject.Find("UpNote");
@@ -180,10 +194,15 @@ public class NoteEmitter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        bool success = false;
+        // respond to key input
         if (Input.GetKeyDown("left") || Input.GetKeyDown("down") || 
             Input.GetKeyDown("right") || Input.GetKeyDown("up"))
         {
+            int successState = 0;
+            // when note is within range & user clicked, check
             if (allNotes.Count > 0 && isValidInput()) {
+                successState = successCheck();
                 if (earlyCheck())
                 {
                     print("TOO EARLY, LOSE");
@@ -194,16 +213,34 @@ public class NoteEmitter : MonoBehaviour
                     print("TOO LATE, LOSE");
                     // Lose function or health - 1
                 }
-                else if (!successCheck())
+                else if (successState == -1)
                 {
                     print("WRONG BUTTON, LOSE");
                     // Lose function or health - 1
                 }
                 else
                 {
+                    success = true;
                     print("SUCCESS!!!");
                     // Success Sound and Visual
                 }
+
+                // play animation and sfx depending on if success or not
+                if (success) {
+                    hitSfx.PlayOneShot(hitSfx.clip, 1f);
+                }
+                else {
+                    missSfx.PlayOneShot(missSfx.clip, 1f);
+                    health--;
+                    Animator heartsAnim = GameObject.Find("Hearts").GetComponent<Animator>();
+                    heartsAnim.Play($"{health}_hearts", -1, 0f);
+                }
+                playAnimation(successState);
+                if (health <= 0) {
+                    print("GAME OVER!!!");
+                }
+                // add to note counter
+                noteCounter++;
                 Destroy(allNotes[0]);
                 allNotes.RemoveAt(0);
                 return;
@@ -213,11 +250,43 @@ public class NoteEmitter : MonoBehaviour
         if  ((allNotes.Count > 0) && 
             ((detector.transform.position.x - allNotes[0].transform.position.x) > tooFarDistance))
         {
-            // Lose function or health - 1
             print("TOO FAR!");
+            // Lose function or health - 1
+            missSfx.PlayOneShot(missSfx.clip, 1f);
+            health--;
+            Animator heartsAnim = GameObject.Find("Hearts").GetComponent<Animator>();
+            heartsAnim.Play($"{health}_hearts", -1, 0f);
+            playAnimation(-1);
+            if (health <= 0) {
+                print("GAME OVER!!!");
+            }
+            noteCounter++;
             Destroy(allNotes[0]);
             allNotes.RemoveAt(0);
             return;
+        }
+    }
+
+    // Play hand and paper animation
+    // 0 = up, 1 = left, 2 = right, 3 = down
+    void playAnimation(int type) {
+        Animator handAnim = GameObject.Find("Hands").GetComponent<Animator>();
+        Animator paperAnim = GameObject.Find("Paper").GetComponent<Animator>();
+
+        Dictionary<int, string> noteDir = new Dictionary<int, string>() {
+            {-1, "fail"}, {0, "up"}, {1, "left"}, {2, "right"}, {3, "down"}
+        };
+        float notesElapsed = (float)noteCounter / (float)numOfNotes;
+        int currentState = 0;
+        if (notesElapsed >= 2f/3f) currentState = 2;
+        else if (notesElapsed >= 1f/3f) currentState = 1;
+        //print($"play {currentState}_{noteDir[type]}");
+
+        if (type == -1) 
+            handAnim.Play("fail_anim", 0);
+        else {
+            handAnim.Play($"{currentState}_{noteDir[type]}", -1, 0f);
+            paperAnim.Play($"{currentState}_{noteDir[type]}", -1, 0f);
         }
     }
 }
