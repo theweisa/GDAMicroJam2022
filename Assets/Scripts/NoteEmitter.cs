@@ -36,6 +36,8 @@ public class NoteEmitter : MonoBehaviour
     private int noteCounter;
     // total number of notes
     private int numOfNotes;
+    // total amount of time passed (for debugging)
+    private float totalTimePassed;
 
     // sfx
     public AudioSource hitSfx;
@@ -100,6 +102,7 @@ public class NoteEmitter : MonoBehaviour
         
         // Instantiates the note at the given spawn location with no rotation
         GameObject emittedNote = (GameObject)Instantiate(emittingNote, new Vector3(x, y, 0), Quaternion.identity);
+        print("After emitting note: " + totalTimePassed + " seconds have passed");
 
         allNotes.Add(emittedNote);
 
@@ -132,7 +135,9 @@ public class NoteEmitter : MonoBehaviour
         {
             // yield return new WaitForSeconds(noteRate);
             // print(timeBeforeNotes[i]);
+            print("Before waiting " + timeBeforeNotes[i] + " ms: " + totalTimePassed + " seconds have passed");
             yield return new WaitForSeconds(timeBeforeNotes[i]/1000f);
+            print("After waiting " + timeBeforeNotes[i] + " ms: " + totalTimePassed + " seconds have passed");
             EmitNote(xEmit, yEmit, xVel);
         }
     }
@@ -152,6 +157,7 @@ public class NoteEmitter : MonoBehaviour
         int difficulty = controller.GetDifficulty();
 
         // Reads the given csv files
+        // StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chartNoPause.csv");
         StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chartNoPause.csv");
 
         // Initializes float for holding the times of notes that are passed over due to difficulty
@@ -195,12 +201,14 @@ public class NoteEmitter : MonoBehaviour
         numberNotes.Add(3, downNote);
 
         // Actually starts the note emitting
+        print("Before Coroutine start: " + totalTimePassed + " seconds have passed");
         StartCoroutine("SpitNotes");
     }
 
     // Update is called once per frame
     void Update()
     {
+        totalTimePassed += Time.deltaTime;
         if (allNotes.Count <= 0) {
             return;
         }
