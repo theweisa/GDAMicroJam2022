@@ -41,3 +41,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Background
+    uniqueID: 3620708281
+    locked: 0
+  - name: paper
+    uniqueID: 2986113717
+    locked: 0
+  - name: hands
+    uniqueID: 3525547357
+    locked: 0
+  - name: UI
+    uniqueID: 3546190251
+    locked: 0
+  - name: Notes
+    uniqueID: 1005023129
+    locked: 0
