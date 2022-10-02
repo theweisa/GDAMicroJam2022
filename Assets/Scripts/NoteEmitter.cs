@@ -5,14 +5,58 @@ using UnityEngine;
 public class NoteEmitter : MonoBehaviour
 {
     // Declared the notes and dictionary here so they can be used in functions
-    public GameObject blueNote;
-    public GameObject redNote;
-    public GameObject greenNote;
-    public GameObject yellowNote;
+    public GameObject blueNote;   // Up
+    public GameObject redNote;    // Down
+    public GameObject greenNote;  // Left
+    public GameObject yellowNote; // Right
     public IDictionary<int, GameObject> numberNotes = new Dictionary<int, GameObject>();
 
     // List of notes to be used by the note detector
     public List<GameObject> allNotes = new List<GameObject>();
+  
+    // Declares note Detector
+    public GameObject detector;
+    // distance for input to be valid
+    public const float validInputDistance = 3f;
+    // distance for input to be too early or late
+    public const float offDistance = 1f;
+
+    // Returns true if distance between first note and noteDetector is close enough to process input
+    bool isValidInput()
+    {
+        if (Mathf.Abs(detector.transform.position.x - allNotes[0].transform.position.x) < validInputDistance)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // Returns true if button press is too early
+    bool earlyCheck()
+    {
+        if ((allNotes[0].transform.position.x - detector.transform.position.x) > offDistance)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // Returns true if button press is too late
+    bool lateCheck()
+    {
+        if ((detector.transform.position.x - allNotes[0].transform.position.x) > offDistance)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    // Returns true if correct button is pressed
+    bool successCheck()
+    {
+        return true;
+        //if (allNotes[0] blue)
+    }
 
     // Takes in note spawn location and speed as arguments
     void EmitNote(float x, float y, float xV)
@@ -61,6 +105,9 @@ public class NoteEmitter : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Gets note Detector
+        detector = GameObject.Find("NotePress");
+
         // Find and add all of the types of notes to a dictionary for randomization purposes
         blueNote = GameObject.Find("BlueNote");
         redNote = GameObject.Find("RedNote");
@@ -78,6 +125,37 @@ public class NoteEmitter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown("left") || Input.GetKeyDown("down") || 
+            Input.GetKeyDown("right") || Input.GetKeyDown("up"))
+        {
+            //Debug.Log(Mathf.Abs(detector.transform.position.x - allNotes[0].transform.position.x));
+            if (isValidInput()) {
+                if (earlyCheck())
+                {
+                    Debug.Log("TOO EARLY, LOSE");
+                    // Lose function
+                    return;
+                }
+                if (lateCheck())
+                {
+                    Debug.Log("TOO LATE, LOSE");
+                    // Lose function
+                    return;
+                }
+                if (!successCheck())
+                {
+                    Debug.Log("WRONG BUTTON, LOSE");
+                    // Lose function
+                    return;
+                }
+                else
+                {
+                    Debug.Log("SUCCESS!!!");
+                    // Delete note here?
+                    return;
+                }
 
+            }
+        }
     }
 }

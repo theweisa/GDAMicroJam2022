@@ -18,7 +18,6 @@ public class pixelDetector : MonoBehaviour
         float maxDistance = 2.0F;
         GameObject detector = GameObject.Find("NotePress");
         GameObject note = GameObject.Find("Note");
-        Debug.Log("HELLO WORLD");
         Debug.Log(Mathf.Abs(detector.transform.position.x - note.transform.position.x));
         if (Mathf.Abs(detector.transform.position.x - note.transform.position.x) < maxDistance)
         {
