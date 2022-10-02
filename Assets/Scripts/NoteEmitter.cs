@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class NoteEmitter : MonoBehaviour
 {
-    // Declared the notes and dictionary here so they can be used in functions
+    // Declared the controller, notes, and dictionary here so they can be used in functions
     public MicrogameJamController controller;
     public GameObject blueNote;
     public GameObject redNote;
@@ -71,24 +71,39 @@ public class NoteEmitter : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Initialize Game Jam Controller
         controller = GameObject.Find("Jam Controller").GetComponent<MicrogameJamController>();
 
-        // int difficulty = controller.GetDifficulty();
-        int difficulty = 3;
+        // Gets current difficulty (1, 2, or 3)
+        int difficulty = controller.GetDifficulty();
 
+        // Reads the given csv files
         StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chart.csv");
+
+        // Initializes float for holding the times of notes that are passed over due to difficulty
         float addedMilliseconds = 0f;
+
+        // Toss away the header line of the csv file
         string line = reader.ReadLine();
+
         while ((line = reader.ReadLine()) != null)
         {
             string[] words = line.Split(',');
+
+            // Get the difficulty of the note
             int noteDifficulty = Int32.Parse(words[1]);
+
+            // If the note is within difficulty, add it to the list
             if (noteDifficulty <= difficulty)
             {
                 float millisecondCount = float.Parse(words[0]);
                 timeBeforeNotes.Add(millisecondCount + addedMilliseconds);
+
+                // Reset the added milliseconds
                 addedMilliseconds = 0f;
             }
+
+            // If it's not, add the milliseconds left over
             else {
                 addedMilliseconds += float.Parse(words[0]);
             }
