@@ -13,6 +13,7 @@ public class NoteEmitter : MonoBehaviour
     public GameObject rightNote; // Right
     public GameObject downNote;  // Down
     public IDictionary<int, GameObject> numberNotes = new Dictionary<int, GameObject>();
+    public int notesPlayed = 0;
 
     // Set milliseconds before each note (needs to be read in from map)
     public List<float> timeBeforeNotes = new List<float>();
@@ -119,6 +120,69 @@ public class NoteEmitter : MonoBehaviour
         }
     }
 
+    void FoldAnimation() {
+        Note note = allNotes[0].GetComponent<Note>();
+        int noteType = note.type;
+        int numOfNotes = timeBeforeNotes.Count;
+        if (notesPlayed > (2 * numOfNotes / 3))
+        {
+            if (noteType == 0)
+            {
+                // Use Fold1/FoldU animation
+            }
+            else if (noteType == 1)
+            {
+                // Use Fold1/FoldL animation
+            }
+            else if (noteType == 2)
+            {
+                // Use Fold1/FoldR animation
+            }
+            else
+            {
+                // Use Fold1/FoldU animation
+            }
+        }
+        else if (notesPlayed > (numOfNotes / 3))
+        {
+            if (noteType == 0)
+            {
+                // Use Fold2/foldU animation
+            }
+            else if (noteType == 1)
+            {
+                // Use Fold2/foldL animation
+            }
+            else if (noteType == 2)
+            {
+                // Use Fold2/foldR animation
+            }
+            else
+            {
+                // Use Fold2/foldU animation
+            }
+        }
+        else
+        {
+            if (noteType == 0)
+            {
+                // Use Fold3/foldU animation
+            }
+            else if (noteType == 1)
+            {
+                // Use Fold3/foldL animation
+            }
+            else if (noteType == 2)
+            {
+                // Use Fold3/foldR animation
+            }
+            else
+            {
+                // Use Fold3/foldU animation
+            }
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -209,8 +273,10 @@ public class NoteEmitter : MonoBehaviour
                 {
                     print("SUCCESS!!!");
                     // Success Sound and Visual
+                    FoldAnimation();
                 }
                 Destroy(allNotes[0]);
+                notesPlayed++;
                 allNotes.RemoveAt(0);
                 return;
             }
@@ -221,6 +287,7 @@ public class NoteEmitter : MonoBehaviour
             // Lose function or health - 1
             print("TOO FAR!");
             Destroy(allNotes[0]);
+            notesPlayed++;
             allNotes.RemoveAt(0);
             return;
         }
