@@ -35,12 +35,20 @@ public class NoteEmitter : MonoBehaviour
     private int noteCounter;
     // total number of notes
     private int numOfNotes;
+    // if game over or not
+    public bool game_over = false;
 
     // sfx
     public AudioSource hitSfx;
     public AudioSource missSfx;
     public AudioSource gameOverSfx;
+    public AudioSource winSfx;
 
+    //animators
+    public Animator handAnim;
+    public Animator paperAnim;
+
+    private int difficulty;
     public int health;
 
     // Returns true if distance between first note and noteDetector is close enough to process input
@@ -93,6 +101,7 @@ public class NoteEmitter : MonoBehaviour
     // Takes in note spawn location and speed as arguments
     void EmitNote(float x, float y, float xV)
     {
+        if (game_over) return;
         // Chooses a random note out of the four to use
         GameObject emittingNote = numberNotes[UnityEngine.Random.Range(0, 4)];
         // GameObject emittingNote = numberNotes[PickRandomNote()];
@@ -147,8 +156,12 @@ public class NoteEmitter : MonoBehaviour
         // Initialize Game Jam Controller
         controller = GameObject.Find("Jam Controller").GetComponent<MicrogameJamController>();
 
+        // Initialize Animations
+        handAnim = GameObject.Find("Hands").GetComponent<Animator>();
+        paperAnim = GameObject.Find("Paper").GetComponent<Animator>();
+
         // Gets current difficulty (1, 2, or 3)
-        int difficulty = controller.GetDifficulty();
+        difficulty = controller.GetDifficulty();
 
         // Reads the given csv files
         StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chartNoPause.csv");
@@ -200,7 +213,7 @@ public class NoteEmitter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (allNotes.Count <= 0) {
+        if (allNotes.Count <= 0 || game_over) {
             return;
         }
         bool success = false;
@@ -249,17 +262,17 @@ public class NoteEmitter : MonoBehaviour
                 }
                 playAnimation(successState);
                 if (health <= 0) {
-                    print("GAME OVER!!!");
+                    gameOver();
+                    return;
                 }
                 // add to note counter
                 noteCounter++;
-                Destroy(allNotes[0]);
-                allNotes.RemoveAt(0);
+                DeleteFrontNote();
                 return;
             }
         }
         // Check if note is too far past detector and add to fail condition
-        if  ((detector.transform.position.x - allNotes[0].transform.position.x) > tooFarDistance)
+        if ((detector.transform.position.x - allNotes[0].transform.position.x) > tooFarDistance)
         {
             print("TOO FAR!");
             // Lose function or health - 1
@@ -269,21 +282,29 @@ public class NoteEmitter : MonoBehaviour
             heartsAnim.Play($"{health}_hearts", -1, 0f);
             playAnimation(-1);
             if (health <= 0) {
-                print("GAME OVER!!!");
+                gameOver();
+                return;
             }
             noteCounter++;
-            Destroy(allNotes[0]);
-            allNotes.RemoveAt(0);
+            DeleteFrontNote();
             return;
+        }
+    }
+
+    // deletes the current front note
+    void DeleteFrontNote() {
+        Destroy(allNotes[0]);
+        allNotes.RemoveAt(0);
+        // you win!
+        if (noteCounter >= numOfNotes && health > 0) {
+            gameWin();
         }
     }
 
     // Play hand and paper animation
     // 0 = up, 1 = left, 2 = right, 3 = down
     void playAnimation(int type) {
-        Animator handAnim = GameObject.Find("Hands").GetComponent<Animator>();
-        Animator paperAnim = GameObject.Find("Paper").GetComponent<Animator>();
-
+        if (game_over) return;
         Dictionary<int, string> noteDir = new Dictionary<int, string>() {
             {-1, "fail"}, {0, "up"}, {1, "left"}, {2, "right"}, {3, "down"}
         };
@@ -299,5 +320,42 @@ public class NoteEmitter : MonoBehaviour
             handAnim.Play($"{currentState}_{noteDir[type]}", -1, 0f);
             paperAnim.Play($"{currentState}_{noteDir[type]}", -1, 0f);
         }
+    }
+
+    // should make it so all notes dissapear, hand is upset and little animation happens for like 1.5 seconds ish
+    void gameOver() {
+        game_over = true;
+        handAnim.SetBool("gameOver", true);
+        paperAnim.SetBool("gameOver", true);
+        for (int i = 0; i < allNotes.Count; i++) {
+            Destroy(allNotes[i]);
+        }
+        allNotes.Clear();
+        // CHANGE THIS TO FALL FROM THE TOP
+        GameObject.Find("FailBg").GetComponent<SpriteRenderer>().enabled = true;
+
+        handAnim.Play("fail_anim");
+        paperAnim.Play("failure");
+        gameOverSfx.PlayOneShot(gameOverSfx.clip, 1f);
+        StartCoroutine("Lose");
+    }
+    IEnumerator Lose() {
+        yield return new WaitForSeconds(2f);
+        controller.LoseGame();
+    }
+
+    void gameWin() {
+        game_over = true;
+        // play animation where hands move apart
+        GameObject.Find("Hands").GetComponent<SpriteRenderer>().enabled = false;
+        GameObject.Find("EndHands").transform.Find("HandL").GetComponent<SpriteRenderer>().enabled = true;
+        GameObject.Find("EndHands").transform.Find("HandR").GetComponent<SpriteRenderer>().enabled = true;
+
+        paperAnim.Play($"win_{difficulty}");
+        winSfx.PlayOneShot(winSfx.clip, 1f);
+    }
+    IEnumerator Win() {
+        yield return new WaitForSeconds(1f);
+        controller.WinGame();
     }
 }

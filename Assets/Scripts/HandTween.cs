@@ -32,7 +32,9 @@ public class HandTween : MonoBehaviour
         // Run this infinitely
         for (;;)
         {
-
+            // if the game is over, stop the tween
+            bool game_over = GameObject.Find("NoteEmitter").GetComponent<NoteEmitter>().game_over;
+            if (game_over) break;
             // Prep for moving the hands up
             float timeElapsed = 0;
             Vector3 tweenStartLocation = transform.position;
