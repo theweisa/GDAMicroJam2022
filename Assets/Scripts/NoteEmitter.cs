@@ -113,7 +113,7 @@ public class NoteEmitter : MonoBehaviour
         for(int i=0; i<numOfNotes; i++)
         {
             // yield return new WaitForSeconds(noteRate);
-            print(timeBeforeNotes[i]);
+            // print(timeBeforeNotes[i]);
             yield return new WaitForSeconds(timeBeforeNotes[i]/1000f);
             EmitNote(xEmit, yEmit, xVel);
         }
@@ -180,10 +180,16 @@ public class NoteEmitter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (allNotes.Count <= 0) {
+            return;
+        }
+
+        detector.GetComponent<SpriteRenderer>().sprite = allNotes[0].GetComponent<SpriteRenderer>().sprite;
+
         if (Input.GetKeyDown("left") || Input.GetKeyDown("down") || 
             Input.GetKeyDown("right") || Input.GetKeyDown("up"))
         {
-            if (allNotes.Count > 0 && isValidInput()) {
+            if (isValidInput()) {
                 if (earlyCheck())
                 {
                     print("TOO EARLY, LOSE");
@@ -210,8 +216,7 @@ public class NoteEmitter : MonoBehaviour
             }
         }
         // Check if note is too far past detector and add to fail condition
-        if  ((allNotes.Count > 0) && 
-            ((detector.transform.position.x - allNotes[0].transform.position.x) > tooFarDistance))
+        if  ((detector.transform.position.x - allNotes[0].transform.position.x) > tooFarDistance)
         {
             // Lose function or health - 1
             print("TOO FAR!");
