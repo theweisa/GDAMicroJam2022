@@ -228,10 +228,7 @@ public class NoteEmitter : MonoBehaviour
                 {
                     success = true;
                     print("SUCCESS!!!");
-<<<<<<< HEAD
-=======
                     // Success Sound and Visual
->>>>>>> ddfbbb971231919ef25ee96b6403aac727fb889a
                 }
 
                 // play animation and sfx depending on if success or not
@@ -291,7 +288,7 @@ public class NoteEmitter : MonoBehaviour
         //print($"play {currentState}_{noteDir[type]}");
 
         if (type == -1) 
-            handAnim.Play("fail_anim", 0);
+            handAnim.Play("fail_anim", -1, 0f);
         else {
             handAnim.Play($"{currentState}_{noteDir[type]}", -1, 0f);
             paperAnim.Play($"{currentState}_{noteDir[type]}", -1, 0f);
