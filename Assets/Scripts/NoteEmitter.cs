@@ -86,11 +86,17 @@ public class NoteEmitter : MonoBehaviour
         return -1;
     }
 
+    // int PickRandomNote()
+    // {
+
+    // }
+
     // Takes in note spawn location and speed as arguments
     void EmitNote(float x, float y, float xV)
     {
         // Chooses a random note out of the four to use
         GameObject emittingNote = numberNotes[UnityEngine.Random.Range(0, 4)];
+        // GameObject emittingNote = numberNotes[PickRandomNote()];
         
         // Instantiates the note at the given spawn location with no rotation
         GameObject emittedNote = (GameObject)Instantiate(emittingNote, new Vector3(x, y, 0), Quaternion.identity);
@@ -146,7 +152,7 @@ public class NoteEmitter : MonoBehaviour
         int difficulty = controller.GetDifficulty();
 
         // Reads the given csv files
-        StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chart.csv");
+        StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chartNoPause.csv");
 
         // Initializes float for holding the times of notes that are passed over due to difficulty
         float addedMilliseconds = 0f;

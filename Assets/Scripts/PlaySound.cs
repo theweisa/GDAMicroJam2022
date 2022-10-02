@@ -7,19 +7,20 @@ public class PlaySound : MonoBehaviour
 
     public GameObject NoteEmitter;
 
-    IEnumerator PlaySong(float time)
-    {
-        // This needs to be the NoteTime var from NoteEmitter.cs (possible export?)
-        yield return new WaitForSeconds(time);
-        audioSource.Play();
-    }
+    // IEnumerator PlaySong(float time)
+    // {
+    //     // This needs to be the NoteTime var from NoteEmitter.cs (possible export?)
+    //     yield return new WaitForSeconds(time);
+    //     audioSource.Play();
+    // }
 
     public AudioSource audioSource;
     // Start is called before the first frame update
     void Start()
     {
-        float time = GameObject.Find("NoteEmitter").GetComponent<NoteEmitter>().noteTime;
-        StartCoroutine(PlaySong(time));
+        // float time = GameObject.Find("NoteEmitter").GetComponent<NoteEmitter>().noteTime;
+        // StartCoroutine(PlaySong(time));
+        audioSource.Play();
     }
 
     // Update is called once per frame
