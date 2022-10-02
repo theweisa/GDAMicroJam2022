@@ -353,9 +353,10 @@ public class NoteEmitter : MonoBehaviour
 
         paperAnim.Play($"win_{difficulty}");
         winSfx.PlayOneShot(winSfx.clip, 1f);
+        StartCoroutine("Win");
     }
     IEnumerator Win() {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(2f);
         controller.WinGame();
     }
 }
