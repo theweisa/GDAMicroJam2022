@@ -86,7 +86,8 @@ public class NoteEmitter : MonoBehaviour
         paperAnim = paper.GetComponent<Animator>();
 
         // Gets current difficulty (1, 2, or 3)
-        difficulty = controller.GetDifficulty();
+        // difficulty = controller.GetDifficulty();
+        difficulty = 3;
 
         // Reads the given csv files
         StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chartNoPause.csv");
