@@ -113,7 +113,7 @@ public class NoteEmitter : MonoBehaviour
         difficulty = controller.GetDifficulty();
 
         // Reads the given csv files
-        StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chartNoPause.csv");
+        StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chart.csv");
 
         // Initializes float for holding the times of notes that are passed over due to difficulty
         float addedMilliseconds = 0f;
