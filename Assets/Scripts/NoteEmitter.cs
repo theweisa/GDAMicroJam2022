@@ -14,6 +14,18 @@ public class NoteEmitter : MonoBehaviour
     public GameObject downNote;  // Down
     public IDictionary<int, GameObject> numberNotes = new Dictionary<int, GameObject>();
 
+    // math for notes
+    float xEmit;
+    float yEmit;
+
+    // Set Note Detector Location
+    float xDetect;
+    float yDetect;
+
+    // Calculates necessary note velocity
+    float xDist;
+    float xVel;
+
     // Sets time for note to get from emitter to detector (in seconds)
     public float noteTime = 2f;
 
@@ -22,13 +34,15 @@ public class NoteEmitter : MonoBehaviour
 
     // List of notes to be used by the note detector
     public List<GameObject> allNotes = new List<GameObject>();
+    // List of notes to be used for fading out
+    public List<GameObject> cloneNotes = new List<GameObject>();
   
     // Declares note Detector
     public GameObject detector;
     // distance for input to be valid
     public const float validInputDistance = 1.25f;
     // distance for input to be too early or late
-    public const float offDistance = 0.5f;
+    public const float offDistance = 0.75f;
     // distance to pop note from list
     public const float tooFarDistance = 1f;
     // number of notes deleted
@@ -39,6 +53,9 @@ public class NoteEmitter : MonoBehaviour
     private int numOfNotes;
     // if game over or not
     public bool game_over = false;
+
+    // lmao
+    private bool lmao = true;
 
     // sfx
     public AudioSource hitSfx;
@@ -54,21 +71,30 @@ public class NoteEmitter : MonoBehaviour
     public Animator handAnim;
     public Animator paperAnim;
 
+    GameObject hearts;
+    GameObject heartsBox;
+
     private int difficulty;
     public int health;
 
     //timers
     private float noteTimer;
 
-    public float bpm;
+    [HideInInspector] public float bpm;
     private float bpmTimer;
+
+    // start buffer
+    private float start_buffer = 0f;
+    private float buffer_timer = 0f;
+
+    private bool start_game = false;
 
     // Start is called before the first frame update
     void Start()
     {
         // seconds per beat
         bpm = 6f/13f;
-        bpmTimer = bpm;
+        bpmTimer = 0f;
         noteCounter = 0;
         noteTimer = 0f;
         notesShot = 0;
@@ -84,13 +110,15 @@ public class NoteEmitter : MonoBehaviour
         handAnim = hands.GetComponent<Animator>();
         paper = GameObject.Find("Paper");
         paperAnim = paper.GetComponent<Animator>();
+        hearts = GameObject.Find("Hearts");
+        heartsBox = GameObject.Find("HeartBox");
 
         // Gets current difficulty (1, 2, or 3)
         // difficulty = controller.GetDifficulty();
         difficulty = 3;
 
         // Reads the given csv files
-        StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chartNoPause.csv");
+        StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chart.csv");
 
         // Initializes float for holding the times of notes that are passed over due to difficulty
         float addedMilliseconds = 0f;
@@ -131,17 +159,34 @@ public class NoteEmitter : MonoBehaviour
         numberNotes.Add(1, leftNote);
         numberNotes.Add(2, rightNote);
         numberNotes.Add(3, downNote);
+
+        // Set Note Spawn Location
+        xEmit = 9f;
+        yEmit = detector.transform.position.y;
+
+        // Set Note Detector Location
+        xDetect = detector.transform.position.x;
+        yDetect = detector.transform.position.y;
+
+        // Set rate of note emitting
+        // float noteRate = 1f;
+
+        // Calculates necessary note velocity
+        xDist = xDetect - xEmit;
+        xVel = xDist / noteTime;
     }
 
     void bpmAnimation() {
-        if (!handAnim.GetCurrentAnimatorStateInfo(0).IsName("default")) {
-            bpmTimer = 0f;
-        }
         bpmTimer += Time.deltaTime;
         if (bpmTimer >= bpm) {
             bpmTimer = 0f;
+            LeanTween.moveY(hearts, hearts.transform.position.y + 0.1f, 0.3f).setEaseShake();
+            LeanTween.moveY(heartsBox, heartsBox.transform.position.y + 0.1f, 0.3f).setEaseShake();
             hands.transform.position = new Vector3(0f, 0f, 0f);
-            LeanTween.moveY(hands, hands.transform.position.y + 0.3f, 0.3f).setEaseShake();
+            if (handAnim.GetCurrentAnimatorStateInfo(0).IsName("default")) {
+                hands.transform.position = new Vector3(0f, 0f, 0f);
+                LeanTween.moveY(hands, hands.transform.position.y + 0.3f, 0.3f).setEaseShake();
+            }
         }
     }
     
@@ -209,25 +254,18 @@ public class NoteEmitter : MonoBehaviour
         if (notesShot >= numOfNotes) {
             return;
         }
-        // Set Note Spawn Location
-        float xEmit = 9f;
-        float yEmit = detector.transform.position.y;
-
-        // Set Note Detector Location
-        float xDetect = detector.transform.position.x;
-        float yDetect = detector.transform.position.y;
-
-        // Set rate of note emitting
-        // float noteRate = 1f;
-
-        // Calculates necessary note velocity
-        float xDist = xDetect - xEmit;
-        float xVel = xDist / noteTime;
-
         // timeBeforeNotes[] is the milliseconds between notes
         float note_interval = timeBeforeNotes[notesShot]/1000f;
         noteTimer += Time.deltaTime;
+        /*if (notesShot == 0) {
+            print($"dT: {Time.deltaTime}");
+            print($"timer: {noteTimer}");
+            print($"shoot; interval: {note_interval}");
+        }*/
+        //print($"constant dT: {Time.deltaTime}");
         if (noteTimer >= note_interval) {
+            //print($"timer shot at: {noteTimer}");
+            //print($"interval shot at: {note_interval}");
             noteTimer = 0f;
             EmitNote(xEmit, yEmit, xVel);
         }
@@ -268,8 +306,10 @@ public class NoteEmitter : MonoBehaviour
 
                 // play animation and sfx depending on if success or not
                 if (success) {
+                    // fade out cloned note
+
                     // tween a direction
-                    hitSfx.PlayOneShot(hitSfx.clip, 1f);
+                    hitSfx.PlayOneShot(hitSfx.clip, 0.7f);
                     playAnimation(successState);
                 }
                 else {
@@ -313,6 +353,19 @@ public class NoteEmitter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        /*if (!start_game) {
+            buffer_timer += Time.deltaTime;
+            if (buffer_timer >= start_buffer) {
+                buffer_timer = 0f;
+                start_game = true;
+                //music.Play();
+                noteTimer = 0f;
+                print("start game");
+            }
+            else {
+                return;
+            }
+        }*/
         shootNote();
         if (allNotes.Count > 0) {
             updateNotes();
@@ -322,12 +375,23 @@ public class NoteEmitter : MonoBehaviour
 
     // deletes the current front note
     void DeleteFrontNote() {
-        Destroy(allNotes[0]);
+        cloneNotes.Insert(0, allNotes[0]);
+        // Destroy(allNotes[0]);
+        Rigidbody2D rb = allNotes[0].GetComponent<Rigidbody2D>();
+        rb.velocity = new Vector3(0, 0, 0);
         allNotes.RemoveAt(0);
+        LeanTween.alpha(cloneNotes[0], 0f, 0.15f).setOnComplete(DestroyNote);
         // you win!
         if (noteCounter >= numOfNotes && health > 0) {
             gameWin();
         }
+    }
+
+    void DestroyNote()
+    {
+        Destroy(cloneNotes[cloneNotes.Count - 1]);
+        cloneNotes.RemoveAt(cloneNotes.Count - 1);
+        return;
     }
 
     // Play hand and paper animation
@@ -343,8 +407,9 @@ public class NoteEmitter : MonoBehaviour
         else if (notesElapsed >= 1f/3f) currentState = 1;
         //print($"play {currentState}_{noteDir[type]}");
 
-        if (type == -1) 
+        if (type == -1) {
             handAnim.Play("fail_anim", -1, 0f);
+        }
         else {
             handAnim.Play($"{currentState}_{noteDir[type]}", -1, 0f);
             paperAnim.Play($"{currentState}_{noteDir[type]}", -1, 0f);
@@ -399,13 +464,15 @@ public class NoteEmitter : MonoBehaviour
         allNotes.Clear();
         // play animation where hands move apart
         GameObject.Find("Hands").GetComponent<SpriteRenderer>().enabled = false;
-        GameObject handL = GameObject.Find("EndHands");
-        GameObject handR = GameObject.Find("EndHands");
-        handL.transform.Find("HandL").GetComponent<SpriteRenderer>().enabled = true;
-        handR.transform.Find("HandR").GetComponent<SpriteRenderer>().enabled = true;
+        GameObject handL = GameObject.Find("EndHands").transform.GetChild(0).gameObject;
+        GameObject handR = GameObject.Find("EndHands").transform.GetChild(1).gameObject;
+        handL.GetComponent<SpriteRenderer>().enabled = true;
+        handR.GetComponent<SpriteRenderer>().enabled = true;
 
-        LeanTween.moveX(handL, handL.transform.position.x - 0.2f, 0f);
-        LeanTween.moveX(handR, handR.transform.position.x + 0.2f, 0f);
+        print("move!");
+        //LeanTween.moveX(hands, hands.transform.position.x + 0.3f, 0.3f).setEaseShake();
+        LeanTween.moveX(handL, handL.transform.position.x - 3f, 0.5f);
+        LeanTween.moveX(handR, handR.transform.position.x + 3f, 0.5f);
 
         paperAnim.Play($"win_{difficulty}");
         winSfx.PlayOneShot(winSfx.clip, 1f);
