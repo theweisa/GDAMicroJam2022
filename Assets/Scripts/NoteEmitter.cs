@@ -6,6 +6,9 @@ using UnityEngine;
 
 public class NoteEmitter : MonoBehaviour
 {
+    static int update_difficulty = 1;
+    static bool change_difficulty = false;
+    static bool increment_difficulty = false;
     // Declaleft the controller, notes and dictionary here so they can be used in functions
     public MicrogameJamController controller;
     public GameObject upNote;  // Up
@@ -109,6 +112,10 @@ public class NoteEmitter : MonoBehaviour
 
         // Gets current difficulty (1, 2, or 3)
         difficulty = controller.GetDifficulty();
+        if (change_difficulty) {
+            difficulty = update_difficulty;
+        }
+        print($"current difficulty: {difficulty}");
 
         // Reads the given csv files
         //StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chart.csv");
@@ -183,6 +190,34 @@ public class NoteEmitter : MonoBehaviour
             }
         }
     }
+
+    void checkUpdateDifficulty() {
+        if (Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift)) {
+            if (Input.GetKeyDown(KeyCode.Return)) {
+                increment_difficulty = !increment_difficulty;
+                change_difficulty = increment_difficulty;
+                print($"incremement difficulty on win: {increment_difficulty}");
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha1)) {
+                increment_difficulty = false;
+                change_difficulty = true;
+                update_difficulty = 1;
+                print("Next difficulty set to 1");
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2)) {
+                increment_difficulty = false;
+                change_difficulty = true;
+                update_difficulty = 2;
+                print("Next difficulty set to 2");
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha3)) {
+                increment_difficulty = false;
+                change_difficulty = true;
+                update_difficulty = 3;
+                print("Next difficulty set to 3");
+            }
+        }
+    }
     
     // Returns true if distance between first note and noteDetector is close enough to process input
     bool isValidInput()
@@ -251,15 +286,8 @@ public class NoteEmitter : MonoBehaviour
         // timeBeforeNotes[] is the milliseconds between notes
         float note_interval = timeBeforeNotes[notesShot]/1000f;
         noteTimer += Time.deltaTime;
-        /*if (notesShot == 0) {
-            print($"dT: {Time.deltaTime}");
-            print($"timer: {noteTimer}");
-            print($"shoot; interval: {note_interval}");
-        }*/
         //print($"constant dT: {Time.deltaTime}");
         if (noteTimer >= note_interval) {
-            //print($"timer shot at: {noteTimer}");
-            //print($"interval shot at: {note_interval}");
             noteTimer = 0f;
             EmitNote(xEmit, yEmit, xVel);
         }
@@ -352,6 +380,7 @@ public class NoteEmitter : MonoBehaviour
             updateNotes();
         }
         bpmAnimation();
+        checkUpdateDifficulty();
     }
 
     // deletes the current front note
@@ -456,6 +485,9 @@ public class NoteEmitter : MonoBehaviour
 
         paperAnim.Play($"win_{difficulty}");
         winSfx.PlayOneShot(winSfx.clip, 1f);
+        if (increment_difficulty) {
+            update_difficulty = (update_difficulty % 3) + 1;
+        }
         StartCoroutine("Win");
     }
     IEnumerator Win() {
