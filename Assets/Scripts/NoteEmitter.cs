@@ -27,7 +27,7 @@ public class NoteEmitter : MonoBehaviour
     float xVel;
 
     // Sets time for note to get from emitter to detector (in seconds)
-    public float noteTime = 2f;
+    public float noteTime;
 
     // Set milliseconds before each note (needs to be read in from map)
     public List<float> timeBeforeNotes = new List<float>();
@@ -109,7 +109,6 @@ public class NoteEmitter : MonoBehaviour
 
         // Gets current difficulty (1, 2, or 3)
         difficulty = controller.GetDifficulty();
-        //difficulty = 3;
 
         // Reads the given csv files
         StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chart.csv");
