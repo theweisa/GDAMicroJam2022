@@ -256,15 +256,15 @@ public class NoteEmitter : MonoBehaviour
         // timeBeforeNotes[] is the milliseconds between notes
         float note_interval = timeBeforeNotes[notesShot]/1000f;
         noteTimer += Time.deltaTime;
-        if (notesShot == 0) {
+        /*if (notesShot == 0) {
             print($"dT: {Time.deltaTime}");
             print($"timer: {noteTimer}");
             print($"shoot; interval: {note_interval}");
-        }
-        print($"constant dT: {Time.deltaTime}");
+        }*/
+        //print($"constant dT: {Time.deltaTime}");
         if (noteTimer >= note_interval) {
-            print($"timer shot at: {noteTimer}");
-            print($"interval shot at: {note_interval}");
+            //print($"timer shot at: {noteTimer}");
+            //print($"interval shot at: {note_interval}");
             noteTimer = 0f;
             EmitNote(xEmit, yEmit, xVel);
         }
@@ -352,7 +352,7 @@ public class NoteEmitter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!start_game) {
+        /*if (!start_game) {
             buffer_timer += Time.deltaTime;
             if (buffer_timer >= start_buffer) {
                 buffer_timer = 0f;
@@ -364,7 +364,7 @@ public class NoteEmitter : MonoBehaviour
             else {
                 return;
             }
-        }
+        }*/
         shootNote();
         if (allNotes.Count > 0) {
             updateNotes();
