@@ -34,6 +34,8 @@ public class NoteEmitter : MonoBehaviour
 
     // List of notes to be used by the note detector
     public List<GameObject> allNotes = new List<GameObject>();
+    // List of notes to be used for fading out
+    public List<GameObject> cloneNotes = new List<GameObject>();
   
     // Declares note Detector
     public GameObject detector;
@@ -303,6 +305,8 @@ public class NoteEmitter : MonoBehaviour
 
                 // play animation and sfx depending on if success or not
                 if (success) {
+                    // fade out cloned note
+
                     // tween a direction
                     hitSfx.PlayOneShot(hitSfx.clip, 0.7f);
                     playAnimation(successState);
@@ -370,12 +374,23 @@ public class NoteEmitter : MonoBehaviour
 
     // deletes the current front note
     void DeleteFrontNote() {
-        Destroy(allNotes[0]);
+        cloneNotes.Insert(0, allNotes[0]);
+        // Destroy(allNotes[0]);
+        Rigidbody2D rb = allNotes[0].GetComponent<Rigidbody2D>();
+        rb.velocity = new Vector3(0, 0, 0);
         allNotes.RemoveAt(0);
+        LeanTween.alpha(cloneNotes[0], 0f, 0.15f).setOnComplete(DestroyNote);
         // you win!
         if (noteCounter >= numOfNotes && health > 0) {
             gameWin();
         }
+    }
+
+    void DestroyNote()
+    {
+        Destroy(cloneNotes[cloneNotes.Count - 1]);
+        cloneNotes.RemoveAt(cloneNotes.Count - 1);
+        return;
     }
 
     // Play hand and paper animation
