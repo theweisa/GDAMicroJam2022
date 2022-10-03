@@ -14,6 +14,18 @@ public class NoteEmitter : MonoBehaviour
     public GameObject downNote;  // Down
     public IDictionary<int, GameObject> numberNotes = new Dictionary<int, GameObject>();
 
+    // math for notes
+    float xEmit;
+    float yEmit;
+
+    // Set Note Detector Location
+    float xDetect;
+    float yDetect;
+
+    // Calculates necessary note velocity
+    float xDist;
+    float xVel;
+
     // Sets time for note to get from emitter to detector (in seconds)
     public float noteTime = 2f;
 
@@ -30,7 +42,7 @@ public class NoteEmitter : MonoBehaviour
     // distance for input to be valid
     public const float validInputDistance = 1.25f;
     // distance for input to be too early or late
-    public const float offDistance = 0.5f;
+    public const float offDistance = 0.75f;
     // distance to pop note from list
     public const float tooFarDistance = 1f;
     // number of notes deleted
@@ -42,11 +54,18 @@ public class NoteEmitter : MonoBehaviour
     // if game over or not
     public bool game_over = false;
 
+    // lmao
+    private bool lmao = true;
+
+    // music
+    //public AudioSource gameMusic;
+
     // sfx
     public AudioSource hitSfx;
     public AudioSource missSfx;
     public AudioSource gameOverSfx;
     public AudioSource winSfx;
+    public AudioSource music;
 
     // hand and paper objs
     public GameObject hands;
@@ -61,15 +80,21 @@ public class NoteEmitter : MonoBehaviour
     //timers
     private float noteTimer;
 
-    public float bpm;
+    [HideInInspector] public float bpm;
     private float bpmTimer;
+
+    // start buffer
+    private float start_buffer = 0f;
+    private float buffer_timer = 0f;
+
+    private bool start_game = false;
 
     // Start is called before the first frame update
     void Start()
     {
         // seconds per beat
         bpm = 6f/13f;
-        bpmTimer = bpm;
+        bpmTimer = 0f;
         noteCounter = 0;
         noteTimer = 0f;
         notesShot = 0;
@@ -90,7 +115,7 @@ public class NoteEmitter : MonoBehaviour
         difficulty = controller.GetDifficulty();
 
         // Reads the given csv files
-        StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chartNoPause.csv");
+        StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chart.csv");
 
         // Initializes float for holding the times of notes that are passed over due to difficulty
         float addedMilliseconds = 0f;
@@ -131,17 +156,32 @@ public class NoteEmitter : MonoBehaviour
         numberNotes.Add(1, leftNote);
         numberNotes.Add(2, rightNote);
         numberNotes.Add(3, downNote);
+
+        // Set Note Spawn Location
+        xEmit = 9f;
+        yEmit = detector.transform.position.y;
+
+        // Set Note Detector Location
+        xDetect = detector.transform.position.x;
+        yDetect = detector.transform.position.y;
+
+        // Set rate of note emitting
+        // float noteRate = 1f;
+
+        // Calculates necessary note velocity
+        xDist = xDetect - xEmit;
+        xVel = xDist / noteTime;
     }
 
     void bpmAnimation() {
-        if (!handAnim.GetCurrentAnimatorStateInfo(0).IsName("default")) {
-            bpmTimer = 0f;
-        }
         bpmTimer += Time.deltaTime;
         if (bpmTimer >= bpm) {
             bpmTimer = 0f;
             hands.transform.position = new Vector3(0f, 0f, 0f);
-            LeanTween.moveY(hands, hands.transform.position.y + 0.3f, 0.3f).setEaseShake();
+            if (handAnim.GetCurrentAnimatorStateInfo(0).IsName("default")) {
+                hands.transform.position = new Vector3(0f, 0f, 0f);
+                LeanTween.moveY(hands, hands.transform.position.y + 0.3f, 0.3f).setEaseShake();
+            }
         }
     }
     
@@ -209,25 +249,18 @@ public class NoteEmitter : MonoBehaviour
         if (notesShot >= numOfNotes) {
             return;
         }
-        // Set Note Spawn Location
-        float xEmit = 9f;
-        float yEmit = detector.transform.position.y;
-
-        // Set Note Detector Location
-        float xDetect = detector.transform.position.x;
-        float yDetect = detector.transform.position.y;
-
-        // Set rate of note emitting
-        // float noteRate = 1f;
-
-        // Calculates necessary note velocity
-        float xDist = xDetect - xEmit;
-        float xVel = xDist / noteTime;
-
         // timeBeforeNotes[] is the milliseconds between notes
         float note_interval = timeBeforeNotes[notesShot]/1000f;
         noteTimer += Time.deltaTime;
+        if (notesShot == 0) {
+            print($"dT: {Time.deltaTime}");
+            print($"timer: {noteTimer}");
+            print($"shoot; interval: {note_interval}");
+        }
+        print($"constant dT: {Time.deltaTime}");
         if (noteTimer >= note_interval) {
+            print($"timer shot at: {noteTimer}");
+            print($"interval shot at: {note_interval}");
             noteTimer = 0f;
             EmitNote(xEmit, yEmit, xVel);
         }
@@ -315,6 +348,19 @@ public class NoteEmitter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!start_game) {
+            buffer_timer += Time.deltaTime;
+            if (buffer_timer >= start_buffer) {
+                buffer_timer = 0f;
+                start_game = true;
+                //gameMusic.Play();
+                noteTimer = 0f;
+                print("start game");
+            }
+            else {
+                return;
+            }
+        }
         shootNote();
         if (allNotes.Count > 0) {
             updateNotes();
@@ -356,8 +402,9 @@ public class NoteEmitter : MonoBehaviour
         else if (notesElapsed >= 1f/3f) currentState = 1;
         //print($"play {currentState}_{noteDir[type]}");
 
-        if (type == -1) 
+        if (type == -1) {
             handAnim.Play("fail_anim", -1, 0f);
+        }
         else {
             handAnim.Play($"{currentState}_{noteDir[type]}", -1, 0f);
             paperAnim.Play($"{currentState}_{noteDir[type]}", -1, 0f);
@@ -396,6 +443,7 @@ public class NoteEmitter : MonoBehaviour
         handAnim.Play("fail_anim");
         paperAnim.Play("failure");
         gameOverSfx.PlayOneShot(gameOverSfx.clip, 1f);
+        music.Stop();
         StartCoroutine("Lose");
     }
     IEnumerator Lose() {
@@ -411,13 +459,15 @@ public class NoteEmitter : MonoBehaviour
         allNotes.Clear();
         // play animation where hands move apart
         GameObject.Find("Hands").GetComponent<SpriteRenderer>().enabled = false;
-        GameObject handL = GameObject.Find("EndHands");
-        GameObject handR = GameObject.Find("EndHands");
-        handL.transform.Find("HandL").GetComponent<SpriteRenderer>().enabled = true;
-        handR.transform.Find("HandR").GetComponent<SpriteRenderer>().enabled = true;
+        GameObject handL = GameObject.Find("EndHands").transform.GetChild(0).gameObject;
+        GameObject handR = GameObject.Find("EndHands").transform.GetChild(1).gameObject;
+        handL.GetComponent<SpriteRenderer>().enabled = true;
+        handR.GetComponent<SpriteRenderer>().enabled = true;
 
-        LeanTween.moveX(handL, handL.transform.position.x - 0.2f, 0f);
-        LeanTween.moveX(handR, handR.transform.position.x + 0.2f, 0f);
+        print("move!");
+        //LeanTween.moveX(hands, hands.transform.position.x + 0.3f, 0.3f).setEaseShake();
+        LeanTween.moveX(handL, handL.transform.position.x - 3f, 0.5f);
+        LeanTween.moveX(handR, handR.transform.position.x + 3f, 0.5f);
 
         paperAnim.Play($"win_{difficulty}");
         winSfx.PlayOneShot(winSfx.clip, 1f);
