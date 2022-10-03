@@ -78,7 +78,7 @@ public class NoteEmitter : MonoBehaviour
     //timers
     private float noteTimer;
 
-    public float bpm;
+    [HideInInspector] public float bpm;
     private float bpmTimer;
 
     // start buffer
