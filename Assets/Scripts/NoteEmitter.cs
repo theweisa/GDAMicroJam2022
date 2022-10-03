@@ -83,12 +83,6 @@ public class NoteEmitter : MonoBehaviour
     [HideInInspector] public float bpm;
     private float bpmTimer;
 
-    // start buffer
-    private float start_buffer = 0f;
-    private float buffer_timer = 0f;
-
-    private bool start_game = false;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -114,8 +108,8 @@ public class NoteEmitter : MonoBehaviour
         heartsBox = GameObject.Find("HeartBox");
 
         // Gets current difficulty (1, 2, or 3)
-        // difficulty = controller.GetDifficulty();
-        difficulty = 3;
+        difficulty = controller.GetDifficulty();
+        //difficulty = 3;
 
         // Reads the given csv files
         StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chart.csv");
@@ -353,19 +347,6 @@ public class NoteEmitter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*if (!start_game) {
-            buffer_timer += Time.deltaTime;
-            if (buffer_timer >= start_buffer) {
-                buffer_timer = 0f;
-                start_game = true;
-                //music.Play();
-                noteTimer = 0f;
-                print("start game");
-            }
-            else {
-                return;
-            }
-        }*/
         shootNote();
         if (allNotes.Count > 0) {
             updateNotes();
