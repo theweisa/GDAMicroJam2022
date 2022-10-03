@@ -45,6 +45,7 @@ public class NoteEmitter : MonoBehaviour
     public AudioSource missSfx;
     public AudioSource gameOverSfx;
     public AudioSource winSfx;
+    public AudioSource music;
 
     // hand and paper objs
     public GameObject hands;
@@ -381,6 +382,7 @@ public class NoteEmitter : MonoBehaviour
         handAnim.Play("fail_anim");
         paperAnim.Play("failure");
         gameOverSfx.PlayOneShot(gameOverSfx.clip, 1f);
+        music.Stop();
         StartCoroutine("Lose");
     }
     IEnumerator Lose() {

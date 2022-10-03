@@ -867,11 +867,13 @@ MonoBehaviour:
   missSfx: {fileID: 1540555918}
   gameOverSfx: {fileID: 847191403}
   winSfx: {fileID: 1520126212}
+  music: {fileID: 1270482189}
   hands: {fileID: 0}
   paper: {fileID: 0}
   handAnim: {fileID: 0}
   paperAnim: {fileID: 0}
   health: 0
+  bpm: 0
 --- !u!4 &701494074
 Transform:
   m_ObjectHideFlags: 0
