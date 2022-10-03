@@ -55,9 +55,6 @@ public class NoteEmitter : MonoBehaviour
     // lmao
     private bool lmao = true;
 
-    // music
-    //public AudioSource gameMusic;
-
     // sfx
     public AudioSource hitSfx;
     public AudioSource missSfx;
@@ -71,6 +68,9 @@ public class NoteEmitter : MonoBehaviour
     //animators
     public Animator handAnim;
     public Animator paperAnim;
+
+    GameObject hearts;
+    GameObject heartsBox;
 
     private int difficulty;
     public int health;
@@ -108,6 +108,8 @@ public class NoteEmitter : MonoBehaviour
         handAnim = hands.GetComponent<Animator>();
         paper = GameObject.Find("Paper");
         paperAnim = paper.GetComponent<Animator>();
+        hearts = GameObject.Find("Hearts");
+        heartsBox = GameObject.Find("HeartBox");
 
         // Gets current difficulty (1, 2, or 3)
         difficulty = controller.GetDifficulty();
@@ -175,6 +177,8 @@ public class NoteEmitter : MonoBehaviour
         bpmTimer += Time.deltaTime;
         if (bpmTimer >= bpm) {
             bpmTimer = 0f;
+            LeanTween.moveY(hearts, hearts.transform.position.y + 0.1f, 0.3f).setEaseShake();
+            LeanTween.moveY(heartsBox, heartsBox.transform.position.y + 0.1f, 0.3f).setEaseShake();
             hands.transform.position = new Vector3(0f, 0f, 0f);
             if (handAnim.GetCurrentAnimatorStateInfo(0).IsName("default")) {
                 hands.transform.position = new Vector3(0f, 0f, 0f);
@@ -300,7 +304,7 @@ public class NoteEmitter : MonoBehaviour
                 // play animation and sfx depending on if success or not
                 if (success) {
                     // tween a direction
-                    hitSfx.PlayOneShot(hitSfx.clip, 1f);
+                    hitSfx.PlayOneShot(hitSfx.clip, 0.7f);
                     playAnimation(successState);
                 }
                 else {
@@ -349,7 +353,7 @@ public class NoteEmitter : MonoBehaviour
             if (buffer_timer >= start_buffer) {
                 buffer_timer = 0f;
                 start_game = true;
-                //gameMusic.Play();
+                //music.Play();
                 noteTimer = 0f;
                 print("start game");
             }
