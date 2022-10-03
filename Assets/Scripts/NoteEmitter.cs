@@ -111,16 +111,17 @@ public class NoteEmitter : MonoBehaviour
         difficulty = controller.GetDifficulty();
 
         // Reads the given csv files
-        StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chart.csv");
-
+        //StreamReader reader = File.OpenText("Assets/Imports/TextFiles/chart.csv");
+        TextAsset fin = Resources.Load<TextAsset>("chart");
         // Initializes float for holding the times of notes that are passed over due to difficulty
         float addedMilliseconds = 0f;
-
         // Toss away the header line of the csv file
-        string line = reader.ReadLine();
-
-        while ((line = reader.ReadLine()) != null)
+        //string line = reader.ReadLine();
+        string[] data = fin.text.Split('\n');
+        //while ((line = reader.ReadLine()) != null)
+        for (int i = 1; i < data.Length; i++)
         {
+            string line = data[i];
             string[] words = line.Split(',');
 
             // Get the difficulty of the note
@@ -449,7 +450,6 @@ public class NoteEmitter : MonoBehaviour
         handL.GetComponent<SpriteRenderer>().enabled = true;
         handR.GetComponent<SpriteRenderer>().enabled = true;
 
-        print("move!");
         //LeanTween.moveX(hands, hands.transform.position.x + 0.3f, 0.3f).setEaseShake();
         LeanTween.moveX(handL, handL.transform.position.x - 3f, 0.5f);
         LeanTween.moveX(handR, handR.transform.position.x + 3f, 0.5f);
