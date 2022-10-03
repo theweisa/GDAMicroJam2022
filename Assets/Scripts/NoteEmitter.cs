@@ -40,7 +40,7 @@ public class NoteEmitter : MonoBehaviour
     // distance for input to be valid
     public const float validInputDistance = 1.25f;
     // distance for input to be too early or late
-    public const float offDistance = 0.5f;
+    public const float offDistance = 0.75f;
     // distance to pop note from list
     public const float tooFarDistance = 1f;
     // number of notes deleted
@@ -56,7 +56,7 @@ public class NoteEmitter : MonoBehaviour
     private bool lmao = true;
 
     // music
-    public AudioSource gameMusic;
+    //public AudioSource gameMusic;
 
     // sfx
     public AudioSource hitSfx;
@@ -172,14 +172,14 @@ public class NoteEmitter : MonoBehaviour
     }
 
     void bpmAnimation() {
-        if (!handAnim.GetCurrentAnimatorStateInfo(0).IsName("default")) {
-            bpmTimer = 0f;
-        }
         bpmTimer += Time.deltaTime;
         if (bpmTimer >= bpm) {
             bpmTimer = 0f;
             hands.transform.position = new Vector3(0f, 0f, 0f);
-            LeanTween.moveY(hands, hands.transform.position.y + 0.3f, 0.3f).setEaseShake();
+            if (handAnim.GetCurrentAnimatorStateInfo(0).IsName("default")) {
+                hands.transform.position = new Vector3(0f, 0f, 0f);
+                LeanTween.moveY(hands, hands.transform.position.y + 0.3f, 0.3f).setEaseShake();
+            }
         }
     }
     
@@ -228,6 +228,7 @@ public class NoteEmitter : MonoBehaviour
     // Takes in note spawn location and speed as arguments
     void EmitNote(float x, float y, float xV)
     {
+        if (game_over) return;
         // Chooses a random note out of the four to use
         GameObject emittingNote = numberNotes[UnityEngine.Random.Range(0, 4)];
         // GameObject emittingNote = numberNotes[PickRandomNote()];
@@ -348,7 +349,7 @@ public class NoteEmitter : MonoBehaviour
             if (buffer_timer >= start_buffer) {
                 buffer_timer = 0f;
                 start_game = true;
-                gameMusic.Play();
+                //gameMusic.Play();
                 noteTimer = 0f;
                 print("start game");
             }
@@ -386,8 +387,9 @@ public class NoteEmitter : MonoBehaviour
         else if (notesElapsed >= 1f/3f) currentState = 1;
         //print($"play {currentState}_{noteDir[type]}");
 
-        if (type == -1) 
+        if (type == -1) {
             handAnim.Play("fail_anim", -1, 0f);
+        }
         else {
             handAnim.Play($"{currentState}_{noteDir[type]}", -1, 0f);
             paperAnim.Play($"{currentState}_{noteDir[type]}", -1, 0f);
