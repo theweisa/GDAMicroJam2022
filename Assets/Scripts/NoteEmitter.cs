@@ -192,7 +192,7 @@ public class NoteEmitter : MonoBehaviour
     }
 
     void checkUpdateDifficulty() {
-        if (Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift)) {
+        if (Input.GetKey(KeyCode.RightShift) || Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.Return)) {
             if (Input.GetKeyDown(KeyCode.Return)) {
                 increment_difficulty = !increment_difficulty;
                 change_difficulty = increment_difficulty;
